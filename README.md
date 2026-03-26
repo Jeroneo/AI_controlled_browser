@@ -2,6 +2,10 @@
 
 A Streamlit web application that uses the DeepSeek API to autonomously control a headless Chrome browser via Selenium. Simply type a prompt in the chat (e.g., "Search for NVIDIA stock"), and the AI will generate and execute the necessary Selenium Python code to perform the action. Features a live-updating view of the browser!
 
+## 🎥 Video Demo
+
+https://github.com/user-attachments/assets/51440176-8edb-45e4-9945-45ddf66741d5
+
 ## ✨ Features
 * **AI-Powered Browser Automation**: Uses `deepseek-chat` to convert natural language into executable Selenium code.
 * **Live Browser View**: A background periodic refresher streams the current state of the headless browser directly to the UI.
