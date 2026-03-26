@@ -1,6 +1,7 @@
 services:
   browser-agent:
-    build: .
+    # Pulls the built image directly from your GitHub Container Registry
+    image: ghcr.io/jeroneo/deepseek-browser-agent:latest
     container_name: deepseek-selenium-agent
     ports:
       - "8501:8501"

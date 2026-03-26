@@ -12,23 +12,36 @@ A Streamlit web application that uses the DeepSeek API to autonomously control a
 * Docker and Docker Compose installed on your system.
 * A valid DeepSeek API Key.
 
-## 🚀 Installation & Setup
+## 🚀 Installation & Setup (via GitHub Registry)
 
-We use Docker to ensure the Streamlit app and the Selenium Headless Chrome environment are perfectly configured without polluting your local machine.
+This project is automatically built and published to the GitHub Container Registry (GHCR) using GitHub Actions. You don't need to build the image locally!
 
-**1. Pull the base Python image:**
-```bash
-docker pull python:3.11-slim
+**1. Set up your `docker-compose.yml`:**
+Ensure you have the `docker-compose.yml` file in your directory configured to pull the image:
+```yaml
+services:
+  browser-agent:
+    image: ghcr.io/jeroneo/deepseek-browser-agent:latest
+    container_name: deepseek-selenium-agent
+    ports:
+      - "8501:8501"
+    shm_size: '2gb'
+    restart: unless-stopped
 ```
 
-**2. Start the application:**
-Run the following command in the root directory of the project (where your `docker-compose.yml` is located) to build and start the containers in detached mode:
+**2. Pull the latest image:**
+```bash
+docker compose pull
+```
+*(Note: If your GitHub repository is private, you will need to authenticate first using `docker login ghcr.io -u YOUR_USERNAME` and a Personal Access Token).*
+
+**3. Start the application:**
 ```bash
 docker compose up -d
 ```
 
-**3. Access the Web UI:**
-Once the containers are running, open your web browser and navigate to:
+**4. Access the Web UI:**
+Once the container is running, open your web browser and navigate to:
 ```text
 http://localhost:8501
 ```
