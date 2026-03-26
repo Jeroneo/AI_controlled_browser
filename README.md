@@ -4,7 +4,7 @@ A Streamlit web application that uses the DeepSeek API to autonomously control a
 
 ## 🎥 Video Demo
 
-<video src="video_demo.mp4" controls="controls" style="max-width: 100%;">
+<video src="https://github.com/jeroneo/AI_controlled_browser/raw/main/video_demo.mp4" controls="controls" style="max-width: 100%;">
   Your browser does not support the video tag.
 </video>
 
