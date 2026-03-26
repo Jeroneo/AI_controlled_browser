@@ -88,79 +88,75 @@ def execute_code(code_str):
     except Exception as e:
         return False, str(e)
 
-# --- UI LAYOUT ---
-col1, col2 = st.columns([1, 1])
+# --- UI LAYOUT (Stacked Vertically) ---
 
-with col1:
-    st.subheader("Live View")
-    if st.session_state.browser_started:
-        
-        # This fragment runs continuously in the background every 2 seconds
-        # Requires Streamlit 1.37 or newer
-        @st.fragment(run_every="2s")
-        def render_live_view():
-            try:
-                # Update screenshot
-                screenshot = st.session_state.driver.get_screenshot_as_png()
-                # Swapped width='stretch' for the modern Streamlit equivalent
-                st.image(screenshot, use_container_width=True) 
-                st.caption(f"📍 {st.session_state.driver.current_url}")
-            except Exception as e:
-                st.error("Browser session lost. Please click 'Stop' then 'Start' again.")
-                
-        render_live_view()
-        
-    else:
-        st.info("Launch the browser to see the live view.")
-
-with col2:
-    st.subheader("Chat")
-    chat_container = st.container(height=550)
+st.subheader("Live View")
+if st.session_state.browser_started:
     
-    for message in st.session_state.messages:
-        with chat_container.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if prompt := st.chat_input("Ex: 'Search for NVIDIA stock'"):
-        if not api_key:
-            st.error("API Key required.")
-        elif not st.session_state.browser_started:
-            st.error("Launch browser first.")
-        else:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with chat_container.chat_message("user"):
-                st.markdown(prompt)
-
-            client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
-            context = get_page_context(st.session_state.driver)
+    # This fragment runs continuously in the background every 2 seconds
+    @st.fragment(run_every="2s")
+    def render_live_view():
+        try:
+            # Update screenshot
+            screenshot = st.session_state.driver.get_screenshot_as_png()
+            st.image(screenshot, use_container_width=True) 
+            st.caption(f"📍 {st.session_state.driver.current_url}")
+        except Exception as e:
+            st.error("Browser session lost. Please click 'Stop' then 'Start' again.")
             
-            with chat_container.chat_message("assistant"):
-                with st.spinner("Executing..."):
-                    # Added imports to the system prompt so the AI knows they are pre-loaded
-                    sys_prompt = (
-                        "You are a Selenium engine. Output ONLY Python code. "
-                        "The following are already imported and available: "
-                        "'driver', 'By', 'Keys', 'WebDriverWait', 'EC', and 'time'."
-                    )
-                    
-                    response = client.chat.completions.create(
-                        model="deepseek-chat",
-                        messages=[
-                            {"role": "system", "content": sys_prompt},
-                            {"role": "user", "content": f"Context:\n{context}\n\nTask: {prompt}"}
-                        ]
-                    )
-                    ai_code = response.choices[0].message.content
-                    
-                    success, error_msg = execute_code(ai_code)
-                    
-                    if success:
-                        display_msg = "✅ Action completed."
-                        if show_code:
-                            st.code(ai_code, language="python")
-                        st.markdown(display_msg)
-                        st.session_state.messages.append({"role": "assistant", "content": display_msg})
-                    else:
-                        st.error(f"❌ Execution failed: {error_msg}")
-                        st.code(ai_code, language="python")
+    render_live_view()
+    
+else:
+    st.info("Launch the browser to see the live view.")
 
+st.divider()
+
+st.subheader("Chat")
+# Reduced height slightly so the input box stays visible when the image is large above it
+chat_container = st.container(height=400) 
+
+for message in st.session_state.messages:
+    with chat_container.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("Ex: 'Search for NVIDIA stock'"):
+    if not api_key:
+        st.error("API Key required.")
+    elif not st.session_state.browser_started:
+        st.error("Launch browser first.")
+    else:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with chat_container.chat_message("user"):
+            st.markdown(prompt)
+
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+        context = get_page_context(st.session_state.driver)
+        
+        with chat_container.chat_message("assistant"):
+            with st.spinner("Executing..."):
+                sys_prompt = (
+                    "You are a Selenium engine. Output ONLY Python code. "
+                    "The following are already imported and available: "
+                    "'driver', 'By', 'Keys', 'WebDriverWait', 'EC', and 'time'."
+                )
+                
+                response = client.chat.completions.create(
+                    model="deepseek-chat",
+                    messages=[
+                        {"role": "system", "content": sys_prompt},
+                        {"role": "user", "content": f"Context:\n{context}\n\nTask: {prompt}"}
+                    ]
+                )
+                ai_code = response.choices[0].message.content
+                
+                success, error_msg = execute_code(ai_code)
+                
+                if success:
+                    display_msg = "✅ Action completed."
+                    if show_code:
+                        st.code(ai_code, language="python")
+                    st.markdown(display_msg)
+                    st.session_state.messages.append({"role": "assistant", "content": display_msg})
+                else:
+                    st.error(f"❌ Execution failed: {error_msg}")
+                    st.code(ai_code, language="python")
