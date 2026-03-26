@@ -1,0 +1,12 @@
+services:
+  browser-agent:
+    build: .
+    container_name: deepseek-selenium-agent
+    ports:
+      - "8501:8501"
+    # This prevents the container from crashing if Chrome uses too much memory
+    shm_size: '2gb'
+    # Optional: If you want to keep your API key in an environment file
+    # env_file:
+    #   - .env
+    restart: unless-stopped
