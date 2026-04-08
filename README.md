@@ -4,7 +4,7 @@ A Streamlit web application that uses the DeepSeek API to autonomously control a
 
 ## 🎥 Video Demo
 
-
+https://github.com/user-attachments/assets/22a81f92-32c1-4069-b6f8-25a36468c356
 
 ## ✨ Features
 * **AI-Powered Browser Automation**: Uses `deepseek-chat` to convert natural language into executable Selenium code.
