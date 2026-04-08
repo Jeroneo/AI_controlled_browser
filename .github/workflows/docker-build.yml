@@ -30,3 +30,7 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/jeroneo/deepseek-browser-agent:latest
+          
+      - name: Trigger Watchtower Update
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.WATCHTOWER_TOKEN }}" ${{ secrets.WATCHTOWER_URL }}/v1/update
